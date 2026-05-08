@@ -1,4 +1,4 @@
-name = "germany-timeline"
+name = 'germanyplanning'
 compatibility_date = "2024-01-01"
 
 # KV namespace binding
