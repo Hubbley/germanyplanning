@@ -1,4 +1,0 @@
-# Cloudflare Pages _redirects
-# Route all unmatched paths to index.html
-/api/*  /api/:splat  200
-/*      /index.html  200
