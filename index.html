@@ -342,62 +342,56 @@ function resetAll(){
   scheduleSave();
 }
 
-// ── Persistence ────────────────────────────────────────────────────────────────
+// ── Persistence via localStorage ──────────────────────────────────────────────
+const LS_KEY = 'germany_timeline_v1';
+
 function scheduleSave(){
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(commitSave,600);
+  saveTimer = setTimeout(commitSave, 400);
 }
 
 function commitSave(){
-  const payload={done:state.done,notes:state.notes};
-  fetch('/api/save',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  }).then(r=>{if(r.ok)flashSaved();})
-  .catch(()=>{
-    try{localStorage.setItem('grt',JSON.stringify(payload));}catch(e){}
-  });
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({done:state.done, notes:state.notes}));
+    flashSaved();
+  } catch(e) {
+    console.warn('Could not save to localStorage:', e);
+  }
 }
 
 function flashSaved(){
-  const i=document.getElementById('saveInd');
+  const i = document.getElementById('saveInd');
   i.classList.add('show');
-  setTimeout(()=>i.classList.remove('show'),1500);
+  setTimeout(() => i.classList.remove('show'), 1500);
 }
 
 function restoreState(saved){
-  if(!saved)return;
+  if(!saved) return;
   if(saved.done){
     Object.entries(saved.done).forEach(([id,v])=>{
-      if(v){const el=document.getElementById(id);if(el)el.classList.add('done');}
+      if(v){ const el=document.getElementById(id); if(el) el.classList.add('done'); }
     });
-    state.done=saved.done;
+    state.done = saved.done;
   }
   if(saved.notes){
     Object.entries(saved.notes).forEach(([id,text])=>{
-      const ta=document.getElementById(`nt-${id}`);
-      if(ta&&text){
-        ta.value=text;
-        document.getElementById(`nc-${id}`).textContent=`${text.length} chars`;
+      const ta = document.getElementById(`nt-${id}`);
+      if(ta && text){
+        ta.value = text;
+        document.getElementById(`nc-${id}`).textContent = `${text.length} chars`;
       }
     });
-    state.notes=saved.notes;
+    state.notes = saved.notes;
   }
   updateProgress();
 }
 
-// Boot
+// Boot — restore from localStorage on page load
 (function boot(){
-  if(window.__SAVED_STATE__){restoreState(window.__SAVED_STATE__);return;}
-  try{
-    const local=localStorage.getItem('grt');
-    if(local)restoreState(JSON.parse(local));
-  }catch(e){}
-  fetch('/api/load')
-    .then(r=>r.ok?r.json():null)
-    .then(d=>{if(d)restoreState(d);})
-    .catch(()=>{});
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if(saved) restoreState(JSON.parse(saved));
+  } catch(e) {}
 })();
 
 updateProgress();
