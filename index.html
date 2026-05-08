@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Germany Relocation Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1410; --paper: #f5f0e8; --cream: #ede8da;
+    --muted: #7a7060; --rule: #c8bfa8; --white: #ffffff;
+  }
+  html { font-size: 15px; scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Instrument Sans', sans-serif; min-height: 100vh; }
+
+  .header { background: var(--ink); color: var(--paper); padding: 3rem 2rem 2.5rem; position: relative; overflow: hidden; }
+  .header::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-55deg,transparent,transparent 40px,rgba(255,255,255,.025) 40px,rgba(255,255,255,.025) 41px); }
+  .header-inner { max-width: 860px; margin: 0 auto; position: relative; }
+  .header-eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(245,240,232,.5); margin-bottom:.75rem; }
+  .header h1 { font-family:'DM Serif Display',serif; font-size:clamp(1.8rem,4vw,2.8rem); line-height:1.15; }
+  .header h1 em { font-style:italic; color:rgba(245,240,232,.65); }
+  .header-sub { font-size:.85rem; color:rgba(245,240,232,.55); margin-top:1rem; max-width:560px; line-height:1.6; }
+
+  .legend { max-width:860px; margin:0 auto; padding:1.1rem 2rem; display:flex; flex-wrap:wrap; gap:.5rem 1.4rem; border-bottom:1px solid var(--rule); }
+  .legend-item { display:flex; align-items:center; gap:.45rem; font-size:.72rem; color:var(--muted); font-family:'DM Mono',monospace; }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  .progress-wrap { position:sticky; top:0; z-index:10; background:var(--paper); border-bottom:1px solid var(--rule); padding:.6rem 2rem; }
+  .progress-inner { max-width:860px; margin:0 auto; display:flex; align-items:center; gap:1rem; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); white-space:nowrap; }
+  .progress-track { flex:1; height:3px; background:var(--rule); border-radius:2px; }
+  .progress-fill { height:100%; background:#2e6b4a; border-radius:2px; transition:width .3s ease; width:0%; }
+  .progress-pct { font-family:'DM Mono',monospace; font-size:.62rem; color:#2e6b4a; min-width:30px; text-align:right; }
+
+  .controls { max-width:860px; margin:0 auto; padding:.75rem 2rem 0; display:flex; justify-content:flex-end; gap:.6rem; }
+  .ctrl-btn { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); background:none; border:1px solid var(--rule); border-radius:2px; padding:4px 10px; cursor:pointer; transition:all .15s; }
+  .ctrl-btn:hover { background:var(--cream); color:var(--ink); }
+
+  .main { max-width:860px; margin:0 auto; padding:2rem 2rem 5rem; }
+
+  .phase { margin-bottom:2.5rem; border:1px solid var(--rule); border-radius:4px; overflow:hidden; animation:fadeUp .4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .phase:nth-child(1){animation-delay:.05s} .phase:nth-child(2){animation-delay:.11s}
+  .phase:nth-child(3){animation-delay:.17s} .phase:nth-child(4){animation-delay:.23s}
+  .phase:nth-child(5){animation-delay:.29s}
+
+  .phase-header { display:flex; align-items:center; gap:1rem; padding:1rem 1.25rem; cursor:pointer; user-select:none; }
+  .phase-header:hover { filter:brightness(.97); }
+  .phase-swatch { width:4px; align-self:stretch; border-radius:2px; flex-shrink:0; }
+  .phase-meta { flex:1; }
+  .phase-label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.16em; text-transform:uppercase; margin-bottom:.22rem; opacity:.75; }
+  .phase-title { font-family:'DM Serif Display',serif; font-size:1.15rem; line-height:1.2; }
+  .phase-window { font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.05em; margin-top:.18rem; opacity:.6; }
+  .phase-chevron { font-size:.75rem; opacity:.4; transition:transform .22s ease; flex-shrink:0; }
+  .phase.open .phase-chevron { transform:rotate(90deg); }
+  .phase-body { display:none; border-top:1px solid var(--rule); background:var(--white); }
+  .phase.open .phase-body { display:block; }
+
+  .alert { margin:.75rem 1.25rem .5rem; padding:.7rem 1rem; border-radius:3px; border-left:3px solid var(--rule); font-size:.77rem; line-height:1.55; color:var(--muted); background:#faf8f4; }
+  .alert.warn { background:#fff9ec; border-color:#d4a84b; color:#6b4e10; }
+  .alert.info { background:#ecf4f9; border-color:#4a8ab0; color:#1a4a6b; }
+  .alert strong { color:var(--ink); }
+
+  .step { border-bottom:1px solid #f0ece4; }
+  .step:last-child { border-bottom:none; }
+
+  .step-main { display:grid; grid-template-columns:28px 1fr auto; align-items:start; gap:.75rem; padding:.85rem 1.25rem .75rem; cursor:pointer; transition:background .12s; user-select:none; }
+  .step-main:hover { background:#faf8f4; }
+  .step.done .step-main { background:#fafaf9; }
+
+  .step-check { width:20px; height:20px; border:1.5px solid var(--rule); border-radius:3px; display:flex; align-items:center; justify-content:center; margin-top:1px; flex-shrink:0; transition:all .14s; font-size:.68rem; color:transparent; pointer-events:none; }
+  .step.done .step-check { background:#2e6b4a; border-color:#2e6b4a; color:#fff; }
+
+  .step-content { min-width:0; pointer-events:none; }
+  .step-title { font-size:.875rem; font-weight:600; line-height:1.4; color:var(--ink); }
+  .step.done .step-title { text-decoration:line-through; opacity:.5; }
+  .step-desc { font-size:.775rem; color:var(--muted); line-height:1.55; margin-top:.28rem; }
+  .step.done .step-desc { opacity:.45; }
+
+  .step-right { display:flex; flex-direction:column; align-items:flex-end; gap:.35rem; flex-shrink:0; margin-top:1px; }
+  .step-tag { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; padding:2px 7px; border-radius:2px; white-space:nowrap; pointer-events:none; }
+  .tag-legal    { background:#eeeaf8; color:#5c3d7a; }
+  .tag-admin    { background:#e8f0f8; color:#2b4a6f; }
+  .tag-required { background:#fde8e8; color:#8b2020; }
+  .tag-employer { background:#fef3e8; color:#8b4a1a; }
+  .tag-prep     { background:#e8f4ed; color:#2e6b4a; }
+  .tag-tax      { background:#fefbe8; color:#6b5a1a; }
+
+  .notes-toggle { display:inline-flex; align-items:center; gap:.3rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); background:none; border:1px solid var(--rule); border-radius:2px; padding:2px 8px; cursor:pointer; transition:all .14s; }
+  .notes-toggle:hover, .notes-toggle.active { background:var(--cream); color:var(--ink); border-color:#a8a090; }
+  .notes-toggle .nt-arrow { font-size:.5rem; transition:transform .2s; display:inline-block; line-height:1; }
+  .notes-toggle.active .nt-arrow { transform:rotate(90deg); }
+
+  .notes-panel { display:none; padding:0 1.25rem .9rem 3.5rem; }
+  .notes-panel.open { display:block; animation:slideIn .18s ease; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+
+  .notes-textarea { width:100%; min-height:72px; padding:.6rem .75rem; font-family:'Instrument Sans',sans-serif; font-size:.8rem; line-height:1.55; color:var(--ink); background:#faf8f4; border:1px solid var(--rule); border-radius:3px; resize:vertical; outline:none; transition:border-color .15s,background .15s; }
+  .notes-textarea:focus { border-color:#a8a090; background:#fff; }
+  .notes-textarea::placeholder { color:#b0a898; }
+  .notes-meta { display:flex; justify-content:space-between; align-items:center; margin-top:.3rem; }
+  .notes-saved { font-family:'DM Mono',monospace; font-size:.6rem; color:#2e6b4a; opacity:0; transition:opacity .3s; letter-spacing:.05em; }
+  .notes-saved.show { opacity:1; }
+  .notes-chars { font-family:'DM Mono',monospace; font-size:.58rem; color:var(--muted); opacity:.6; }
+
+  .save-indicator { position:fixed; top:.75rem; right:1rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; padding:3px 10px; border-radius:2px; background:#2e6b4a; color:#fff; opacity:0; transition:opacity .3s; z-index:100; pointer-events:none; }
+  .save-indicator.show { opacity:1; }
+
+  @media (max-width:600px) {
+    .header,.legend,.controls,.main,.progress-wrap { padding-left:1.1rem; padding-right:1.1rem; }
+    .step-main { grid-template-columns:24px 1fr; }
+    .step-right { display:none; }
+    .notes-panel { padding-left:2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="save-indicator" id="saveInd">Saved</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow">Relocation Plan · US Citizen → Germany</div>
+    <h1>Your Path to Germany<br><em>with employer continuity</em></h1>
+    <p class="header-sub">A unified 24-month checklist covering immigration, marriage, residence permit, and Men4Choice employer compliance — running in parallel, not sequence.</p>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#8b2020"></div>Required</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2b4a6f"></div>Admin</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5c3d7a"></div>Legal</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b4a1a"></div>Employer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2e6b4a"></div>Prep</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6b5a1a"></div>Tax</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <span class="progress-label">Progress</span>
+    <div class="progress-track"><div class="progress-fill" id="pbar"></div></div>
+    <span class="progress-pct" id="ppct">0%</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">Expand all</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">Collapse all</button>
+  <button class="ctrl-btn" onclick="resetAll()">Reset checklist</button>
+</div>
+
+<div class="main" id="phases"></div>
+
+<script>
+const PHASES = [
+  {
+    color:'#2b4a6f',bg:'#e8f0f8',
+    label:'Phase 1 · Immigration & Documents',
+    title:'Groundwork & Document Collection',
+    window:'Now → Month 3',
+    alerts:[{type:'info',text:'<strong>Start here first.</strong> The Apostille and court exemption processes are the longest lead-time items in the entire plan. Everything else is blocked until these are in motion.'}],
+    steps:[
+      {title:'Confirm your US passport has 5+ years validity',desc:"If renewal is needed, allow 8–12 weeks. Do this before anything else.",tag:'required'},
+      {title:'Obtain a certified copy of your US birth certificate',desc:"Official state-issued copy from vital records — not a hospital copy. Must list parents' names.",tag:'required'},
+      {title:'Get your birth certificate Apostilled',desc:"Apply to the Secretary of State in the issuing state. Processing: 2–8 weeks. Cost: $10–20.",tag:'legal'},
+      {title:'Arrange certified sworn German translations of US documents',desc:"Sworn translator (beglaubigte Übersetzung) only — no online services. Budget €30–60/page.",tag:'required'},
+      {title:'Your partner contacts the Standesamt for the precise document checklist',desc:"Requirements vary by municipality. Get the list in writing. Both partners should appear in person if possible.",tag:'admin'},
+    ]
+  },
+  {
+    color:'#5c3d7a',bg:'#f2ecf8',
+    label:'Phase 2 · Marriage',
+    title:'Civil Marriage at the Standesamt',
+    window:'Month 3–8',
+    alerts:[{type:'warn',text:"<strong>The court exemption is the real bottleneck.</strong> The Standesamt files on your behalf with the regional Oberlandesgericht. Allow 2–8 weeks with no way to expedite. The exemption is valid for 6 months once granted — book your ceremony within that window."}],
+    steps:[
+      {title:'Submit complete document package to the Standesamt',desc:"Both passports, Apostilled birth certificate + translation, any divorce/death records if previously married. The Familienbuch was abolished in 2009 — your partner does not need to produce one.",tag:'admin'},
+      {title:'Standesamt files for court exemption (Befreiung vom Ehefähigkeitszeugnis)',desc:"The US does not issue a CNI. The Standesamt handles this automatically. Court fee: €15–305 (income-based).",tag:'legal'},
+      {title:'Book your civil ceremony date',desc:"Do this as soon as the exemption is granted. Popular dates fill months ahead. Weekday standard fee: €40–150.",tag:'admin'},
+      {title:'Arrange a certified interpreter if needed',desc:"Required if either partner cannot follow the proceedings in German. Cost: approx. €150–300. Confirm requirement with your Standesamt.",tag:'prep'},
+      {title:'Legally marry at the Standesamt — collect 3–4 certified Heiratsurkunde copies',desc:"Witnesses are optional (up to two, 18+, valid ID). Notify the registrar 8 days in advance if you want witnesses.",tag:'legal'},
+      {title:'Decide your married surname under the updated May 2025 German naming law',desc:"Options: one partner's name; a combined double-barrelled surname (max two parts, with or without hyphen); or each partner keeps their own name.",tag:'legal'},
+    ]
+  },
+  {
+    color:'#8b4a1a',bg:'#f8f0e8',
+    label:'Phase 3 · Men4Choice Employer Compliance — PARALLEL TRACK',
+    title:'Employer Compliance (Men4Choice)',
+    window:'Now → Month 12 · Run in parallel',
+    alerts:[
+      {type:'warn',text:'<strong>This track must start NOW, not after you move.</strong> The Certificate of Coverage application, PE risk assessment, and contract amendments all need to be in place before you begin working from Germany.'},
+      {type:'info',text:"<strong>Why Men4Choice's risk is lower than average:</strong> As a US domestic advocacy nonprofit with no German clients, donors, or revenue, your Germany presence has no commercial reason — the key test under the OECD's November 2025 framework. This works in your favor, but it must be documented, not assumed."}
+    ],
+    steps:[
+      {title:'Brief Men4Choice leadership and board on cross-border implications',desc:"Frame this correctly: your move creates manageable compliance obligations — not a crisis — but requires proactive action before you relocate. This is a board-level awareness item given fiduciary obligations.",tag:'admin'},
+      {title:'Engage a US–Germany cross-border tax advisor',desc:"Not your regular accountant — specifically someone with international employment compliance expertise. Ask for: PE risk assessment for your role, social security treatment, and contract structuring. Budget $2,000–5,000. This is the most important single step on this track.",tag:'employer'},
+      {title:'Apply to the SSA for a Certificate of Coverage (US–Germany totalization)',desc:"Keeps you in the US social security system and exempts both you and Men4Choice from German pension/health/unemployment contributions. File early. Apply at ssa.gov/international.",tag:'tax'},
+      {title:'Amend your employment agreement with a German remote work addendum',desc:"Addendum must state: (1) Germany location is personal/family only with no German business purpose; (2) you hold no authority to conclude contracts or make binding commitments from Germany — all such actions through US-based personnel; (3) governing law remains US law.",tag:'legal'},
+      {title:"Men4Choice formally documents the remote work approval",desc:"Board minutes or written HR memo confirming the Germany arrangement is approved for personal reasons only, with no German commercial purpose. Primary evidence if a German tax authority ever asserts a commercial reason for your presence.",tag:'employer'},
+      {title:'Quick GDPR scoping review',desc:"Assess whether your role involves processing personal data of any EU residents. For a US domestic advocacy nonprofit this is likely very low risk, but a one-page review is worth having documented.",tag:'prep'},
+      {title:"Confirm Men4Choice's US health insurance coverage abroad",desc:"Your Aufenthaltserlaubnis requires German health insurance. Men4Choice's US plan may not cover you abroad. Clarify gaps and whether an international supplement is needed.",tag:'admin'},
+    ]
+  },
+  {
+    color:'#2e6b4a',bg:'#e8f4ed',
+    label:'Phase 4 · Residence Permit',
+    title:'Moving & Settling in Germany',
+    window:'Month 8–18 · After marriage',
+    alerts:[{type:'info',text:'<strong>No pre-travel visa required.</strong> As a US citizen, you enter Germany visa-free and apply for your residence permit directly at the Ausländerbehörde after arrival. Do not apply at a German consulate in the US beforehand.'}],
+    steps:[
+      {title:'Enter Germany and register your address (Anmeldung) within 2 weeks',desc:"At your local Einwohnermeldeamt or Bürgeramt. Bring: passport, Anmeldeformular, and landlord's written tenancy confirmation (Wohnungsgeberbestätigung). You receive a Meldebescheinigung — keep it.",tag:'legal'},
+      {title:'Obtain German health insurance before your residence permit appointment',desc:"Mandatory — cannot apply for Aufenthaltserlaubnis without it. If your partner is in the statutory GKV system and employed, you can typically be co-insured as a dependent at no extra cost.",tag:'required'},
+      {title:'Obtain A1 German language certificate (Goethe-Institut or telc)',desc:"Generally required for the spouse Aufenthaltserlaubnis under §30 AufenthG. Confirm exemption availability with your Ausländerbehörde first. Start studying early regardless.",tag:'required'},
+      {title:'Apply for Aufenthaltserlaubnis at the local Ausländerbehörde',desc:"As spouse of a German citizen, entitled under §28 AufenthG. Bring: passport, Meldebescheinigung, Heiratsurkunde + translation, partner's German ID, health insurance proof, A1 certificate, passport photos, application forms. Apply before your 90-day visa-free period expires.",tag:'legal'},
+      {title:'Update Men4Choice payroll with your German work address',desc:"Confirm the Certificate of Coverage is active before doing this. Notify HR that your working location is now Germany — this activates the compliance framework from Phase 3.",tag:'employer'},
+      {title:'Implement a working hours logging system',desc:"Germany's Federal Labour Court (2022) requires systematic time recording for all employees including remote workers. A simple shared log works. Also track which country you work from each day.",tag:'employer'},
+    ]
+  },
+  {
+    color:'#5a1a1a',bg:'#f8ecec',
+    label:'Phase 5 · Long-term',
+    title:'Settlement & Future Options',
+    window:'Month 18–36+',
+    alerts:[{type:'info',text:'<strong>After 3 years of lawful residence + 2 years of marriage</strong> you are eligible for a Niederlassungserlaubnis (permanent residence). Naturalization is also possible — though Germany may require renouncing US citizenship; consult an attorney well in advance.'}],
+    steps:[
+      {title:'Renew Certificate of Coverage annually with SSA',desc:"The totalization certificate requires periodic renewal. Set a calendar reminder 3 months before expiry. Men4Choice HR should own this process.",tag:'tax'},
+      {title:'Annual PE risk check-in with cross-border tax advisor',desc:"A brief annual review to confirm your role hasn't evolved in ways that change the PE or permanent representative analysis — particularly important if your Men4Choice responsibilities expand.",tag:'employer'},
+      {title:'Track path to Niederlassungserlaubnis (permanent residence)',desc:"Eligible after 3 years lawful residence + 2 years marriage. Requirements: adequate German, financial self-sufficiency, clean criminal record, sufficient pension contributions.",tag:'prep'},
+      {title:'Consider enrolling in the BAMF Integrationskurs',desc:"BAMF-funded course: German to B1 + civic orientation. Free or heavily subsidised for Aufenthaltserlaubnis holders. Accelerates permanent residence and citizenship pathways.",tag:'prep'},
+      {title:'File joint US taxes using FEIE or Foreign Tax Credit',desc:"You remain a US taxpayer regardless of where you live. The FEIE allows exclusion of up to ~$130k of foreign-earned income (2025). Use an expat-specialist CPA.",tag:'tax'},
+      {title:'Consult attorney before pursuing German naturalization',desc:"Germany may require renouncing US citizenship. This is a significant, permanent decision — get proper legal advice years in advance before pursuing this path.",tag:'legal'},
+    ]
+  }
+];
+
+const TAG_LABELS = {legal:'Legal',admin:'Admin',required:'Required',employer:'Employer',prep:'Prep',tax:'Tax'};
+
+let state = {done:{},notes:{}};
+let saveTimer = null;
+const noteTimers = {};
+
+// ── Build DOM ──────────────────────────────────────────────────────────────────
+const container = document.getElementById('phases');
+PHASES.forEach((phase, pi) => {
+  const el = document.createElement('div');
+  el.className = 'phase' + (pi===0?' open':'');
+  el.id = `phase-${pi}`;
+
+  const alerts = (phase.alerts||[]).map(a=>`<div class="alert ${a.type}">${a.text}</div>`).join('');
+
+  const steps = phase.steps.map((s,si)=>{
+    const id=`s${pi}-${si}`;
+    return `<div class="step" id="${id}" data-id="${id}">
+      <div class="step-main" onclick="toggleStep('${id}')">
+        <div class="step-check">✓</div>
+        <div class="step-content">
+          <div class="step-title">${s.title}</div>
+          <div class="step-desc">${s.desc}</div>
+        </div>
+        <div class="step-right">
+          <span class="step-tag tag-${s.tag}">${TAG_LABELS[s.tag]}</span>
+          <button class="notes-toggle" onclick="toggleNotes(event,'${id}')" type="button">
+            <span class="nt-arrow">▶</span>&nbsp;Notes
+          </button>
+        </div>
+      </div>
+      <div class="notes-panel" id="np-${id}">
+        <textarea class="notes-textarea" id="nt-${id}" placeholder="Add your notes, appointments, contacts, reference numbers…" oninput="onNoteInput('${id}')" rows="3"></textarea>
+        <div class="notes-meta">
+          <span class="notes-saved" id="ns-${id}">Saved</span>
+          <span class="notes-chars" id="nc-${id}">0 chars</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="phase-header" onclick="togglePhase('phase-${pi}')" style="background:${phase.bg}">
+      <div class="phase-swatch" style="background:${phase.color}"></div>
+      <div class="phase-meta">
+        <div class="phase-label" style="color:${phase.color}">${phase.label}</div>
+        <div class="phase-title">${phase.title}</div>
+        <div class="phase-window">${phase.window}</div>
+      </div>
+      <span class="phase-chevron">▶</span>
+    </div>
+    <div class="phase-body">${alerts}${steps}</div>`;
+  container.appendChild(el);
+});
+
+// ── Interactions ───────────────────────────────────────────────────────────────
+function togglePhase(id){ document.getElementById(id).classList.toggle('open'); }
+
+function toggleStep(id){
+  const el=document.getElementById(id);
+  state.done[id]=el.classList.toggle('done');
+  updateProgress();
+  scheduleSave();
+}
+
+function toggleNotes(e,id){
+  e.stopPropagation();
+  const panel=document.getElementById(`np-${id}`);
+  const btn=e.currentTarget;
+  const open=panel.classList.toggle('open');
+  btn.classList.toggle('active',open);
+  if(open) setTimeout(()=>document.getElementById(`nt-${id}`).focus(),50);
+}
+
+function onNoteInput(id){
+  const ta=document.getElementById(`nt-${id}`);
+  const v=ta.value;
+  state.notes[id]=v;
+  document.getElementById(`nc-${id}`).textContent=`${v.length} chars`;
+  clearTimeout(noteTimers[id]);
+  noteTimers[id]=setTimeout(()=>{
+    scheduleSave();
+    const s=document.getElementById(`ns-${id}`);
+    s.classList.add('show');
+    setTimeout(()=>s.classList.remove('show'),1800);
+  },800);
+}
+
+function updateProgress(){
+  const all=document.querySelectorAll('.step').length;
+  const done=document.querySelectorAll('.step.done').length;
+  const pct=all?Math.round(done/all*100):0;
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('ppct').textContent=pct+'%';
+}
+
+function toggleAll(open){
+  document.querySelectorAll('.phase').forEach(p=>p.classList.toggle('open',open));
+}
+
+function resetAll(){
+  if(!confirm('Reset all checkboxes? Notes will be kept.'))return;
+  document.querySelectorAll('.step.done').forEach(s=>s.classList.remove('done'));
+  Object.keys(state.done).forEach(k=>delete state.done[k]);
+  updateProgress();
+  scheduleSave();
+}
+
+// ── Persistence ────────────────────────────────────────────────────────────────
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(commitSave,600);
+}
+
+function commitSave(){
+  const payload={done:state.done,notes:state.notes};
+  fetch('/api/save',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(r=>{if(r.ok)flashSaved();})
+  .catch(()=>{
+    try{localStorage.setItem('grt',JSON.stringify(payload));}catch(e){}
+  });
+}
+
+function flashSaved(){
+  const i=document.getElementById('saveInd');
+  i.classList.add('show');
+  setTimeout(()=>i.classList.remove('show'),1500);
+}
+
+function restoreState(saved){
+  if(!saved)return;
+  if(saved.done){
+    Object.entries(saved.done).forEach(([id,v])=>{
+      if(v){const el=document.getElementById(id);if(el)el.classList.add('done');}
+    });
+    state.done=saved.done;
+  }
+  if(saved.notes){
+    Object.entries(saved.notes).forEach(([id,text])=>{
+      const ta=document.getElementById(`nt-${id}`);
+      if(ta&&text){
+        ta.value=text;
+        document.getElementById(`nc-${id}`).textContent=`${text.length} chars`;
+      }
+    });
+    state.notes=saved.notes;
+  }
+  updateProgress();
+}
+
+// Boot
+(function boot(){
+  if(window.__SAVED_STATE__){restoreState(window.__SAVED_STATE__);return;}
+  try{
+    const local=localStorage.getItem('grt');
+    if(local)restoreState(JSON.parse(local));
+  }catch(e){}
+  fetch('/api/load')
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{if(d)restoreState(d);})
+    .catch(()=>{});
+})();
+
+updateProgress();
+</script>
+</body>
+</html>

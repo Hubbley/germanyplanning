@@ -1,0 +1,14 @@
+name = "germany-timeline"
+compatibility_date = "2024-01-01"
+
+# KV namespace binding
+# After creating your KV namespace in the Cloudflare dashboard,
+# replace YOUR_KV_NAMESPACE_ID_HERE with the actual ID.
+# See DEPLOY.md Step 4 for instructions.
+
+[[kv_namespaces]]
+binding = "PROGRESS"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+# Preview binding (used during local wrangler dev)
+# preview_id = "YOUR_KV_PREVIEW_NAMESPACE_ID_HERE"
